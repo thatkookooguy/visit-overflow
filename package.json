@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "start:monitor": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,10 +13,12 @@
   "dependencies": {
     "@types/moment": "^2.13.0",
     "@types/nconf": "^0.10.0",
+    "@types/nodemon": "^1.19.0",
     "@types/puppeteer": "^2.0.0",
     "moment": "^2.24.0",
     "nconf": "^0.10.0",
     "node-cron": "^2.0.3",
+    "nodemon": "^2.0.2",
     "puppeteer": "^2.0.0",
     "pushbullet": "^2.4.0"
   }
