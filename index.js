@@ -76,6 +76,7 @@ async function visitStackOverflow() {
 
   const element = await page.$('.days-visited');
   const daysVisited = element ? (await page.evaluate(element => element.innerText, element)).trim() : 'Daily visit';
+  const daysLeft = 100 - (+daysVisited.replace(/Visited \d+ days, /ig, '').replace('consecutive', '').trim());
  
   await browser.close();
   
@@ -96,9 +97,11 @@ async function visitStackOverflow() {
     await axios.post(
       hassWebhookUrl,
       {
+        timestamp: new Date().getTime(),
         title: `stackoverflow [${ now }]`,
         text: daysVisited,
-        image: screenshot.toString('base64')
+        image: screenshot.toString('base64'),
+        daysLeft
       }
     );
   }
