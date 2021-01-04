@@ -10,7 +10,7 @@ let pusher;
 
 nconf.argv()
    .env({ lowerCase: true })
-   .file({ file: 'config/config.json' });
+   .file({ file: '/config/config.json' });
 
 const userEmail = nconf.get('stackoverflow:email');
 const userPassword = nconf.get('stackoverflow:password');
@@ -44,7 +44,13 @@ cron.schedule(`0 ${ scheduledHourOfDay } * * *`, visitStackOverflow, {
 async function visitStackOverflow() {
   console.log('running stackoverflow task twice a day');
 
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-gpu",
+  ]
+  });
   const page = await browser.newPage();
   await page.setViewport({
     height: 700,
@@ -55,17 +61,17 @@ async function visitStackOverflow() {
   await page.type('input#email', userEmail);
   await page.type('input#password', userPassword);
   await page.focus('button#submit-button');
-  await page.waitFor(5000);
+  await page.waitForTimeout(5000);
   await page.click('button#submit-button');
   await page.waitForNavigation();
-  await page.waitFor(5000);
+  await page.waitForTimeout(5000);
   const now = moment().format('YYYY-MM-DD HH[H]');
   const fileName = `${ now }-screenshot.png`;
   let screenshot;
   if (takeScreenshot) {
-    screenshot = await page.screenshot({ path: fileName });
+    screenshot = await page.screenshot({ path: fileName, clip: {x: 150, y: 150, width: 1250 - 150, height: 450 - 150} });
   } else {
-    screenshot = await page.screenshot({ encoding: 'binary' });
+    screenshot = await page.screenshot({ encoding: 'binary', clip: {x: 150, y: 150, width: 1250 - 150, height: 450 - 150} });
   }
 
   const element = await page.$('.days-visited');
@@ -73,7 +79,7 @@ async function visitStackOverflow() {
  
   await browser.close();
   
-  if (pushbulletApiKey && pusher) {
+  if (false && pushbulletApiKey && pusher) {
     pusher.file({}, screenshot, `stackoverflow [${ now }] - ${ daysVisited }`, (err, res) => {
       if (err) {
         console.error(err);
@@ -86,12 +92,23 @@ async function visitStackOverflow() {
   }
 
   if (hassWebhookUrl) {
+    console.log('sending to hass!', hassWebhookUrl);
     await axios.post(
       hassWebhookUrl,
       {
-        test: `stackoverflow [${ now }] - ${ daysVisited }`,
-        image: 'data:image/png;base64,' + screenshot.toString('base64')
+        title: `stackoverflow [${ now }]`,
+        text: daysVisited,
+        image: screenshot.toString('base64')
       }
     );
   }
+}
+
+function toArrayBuffer(buf) {
+  var ab = new ArrayBuffer(buf.length);
+  var view = new Uint8Array(ab);
+  for (var i = 0; i < buf.length; ++i) {
+      view[i] = buf[i];
+  }
+  return ab;
 }

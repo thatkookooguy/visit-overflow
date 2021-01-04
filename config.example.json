@@ -1,0 +1,13 @@
+{
+    "timezone": "Asia/Jerusalem",
+    "pushbullet": "<TOKEN>",
+    "hassUrl": "<HASSIO_URL>",
+    "screenshot": true,
+    "scheduledHourOfDay": "16,23",
+    "stackoverflow": {
+      "email": "<EMAIL>",
+      "password": "<PASSWORD>"
+    },
+    "returnUrl": "https://stackoverflow.com/users/1788884/thatkookooguy?tab=profile"
+  }
+  
