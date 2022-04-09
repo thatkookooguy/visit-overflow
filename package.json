@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "nconf": "^0.11.0",
     "node-cron": "^2.0.3",
     "nodemon": "^2.0.2",
